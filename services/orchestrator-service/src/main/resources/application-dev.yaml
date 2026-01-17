@@ -1,0 +1,32 @@
+
+spring:
+  application:
+    name: orchestrator-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/orchestrator_db
+    username: metadata_user
+    password: metadata_pass
+    driver-class-name: org.postgresql.Driver
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+server:
+  port: 8083
+
+logging:
+  level:
+    root: INFO
+    com.dataplatform.os: DEBUG
+
+orchestrator:
+  scheduler:
+    cron: "0 */15 * * * *"   # every 15 minutes
+
+
+
+  metadata-service:
+    base-url: http://localhost:8081
+    endpoints:
+      pipeline: /api/v1/metadata/pipelines/{datasetId}

@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: ingestion-service
+
+  profiles:
+    active: dev
+
+    jpa:
+      open-in-view: false
+      hibernate:
+        ddl-auto: none
+
+    flyway:
+      enabled: true
+      locations: classpath:db/migration
+
+  server:
+    port: 8080
+
+  logging:
+    level:
+      root: INFO
+      com.dataplatform.is: DEBUG
+
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info,metrics
+

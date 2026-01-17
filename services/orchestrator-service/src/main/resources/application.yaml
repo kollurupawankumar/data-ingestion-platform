@@ -1,0 +1,83 @@
+
+spring:
+  application:
+    name: orchestrator-service
+
+  profiles:
+    active: dev
+
+  cloud:
+    compatibility-verifier:
+      enabled: false
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: UTC
+
+  jpa:
+    open-in-view: false
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+
+    consumer:
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
+    listener:
+      ack-mode: MANUAL
+
+server:
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    com.dataplatform.os: INFO
+
+orchestrator:
+  scheduler:
+    enabled: true
+  execution:
+    max-parallel-pipelines: 5
+    fail-fast: true
+
+  retry:
+    max-attempts: 3
+    backoff-seconds:
+      - 5
+      - 15
+      - 30
+
+  kafka:
+    topics:
+      stage-start: pipeline.stage.start
+      stage-complete: pipeline.stage.complete
+      stage-failed: pipeline.stage.failed
+      stage-retry: pipeline.stage.retry
+      stage-dlq: pipeline.stage.dlq
+

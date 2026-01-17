@@ -1,0 +1,231 @@
+Metadata Domains (Big Buckets)
+---------------------------------------------------
+1. Structural metadata  (WHAT exists)
+2. Processing metadata  (HOW to process)
+3. Target metadata      (WHERE to write)
+4. Runtime metadata     (WHAT happened)
+
+
+
+Step 2️⃣: Structural Metadata (FOUNDATION)
+1️⃣ SUBJECT_AREA
+Why it exists
+
+Logical grouping
+
+UI navigation
+
+Orchestrator scope
+
+Example
+workforce
+
+Rules
+
+Rarely changes
+
+Created manually or via YAML
+
+One subject area → many entities
+
+Think of it as
+
+“A folder, not a pipeline”
+
+2️⃣ ENTITY
+Why this is the most important table
+
+If this is wrong, everything is wrong.
+
+What an entity represents
+
+One independently executable ingestion unit
+
+Examples
+Subject Area	Entity
+workforce	employee
+workforce	department
+workforce	salgrade
+What ENTITY must answer
+
+Is this active?
+
+Can this run now?
+
+Is this full or incremental?
+
+What is its SLA?
+
+Entity lifecycle
+CREATED → ACTIVE → PAUSED → DEPRECATED
+
+Step 3️⃣: Processing Metadata (ENGINE INSTRUCTIONS)
+
+This metadata tells your generic engines what to do.
+
+3️⃣ SOURCE_METADATA
+Purpose
+
+Defines where raw data comes from
+
+One entity → exactly one source (for MVP)
+Example: employee
+Source Type: FILE
+Path: /data/workforce/employee.csv
+Format: CSV
+
+Design rule
+
+Source config is opaque to orchestrator
+
+Only ingestion service understands it
+
+Think:
+
+“Metadata service stores it, ingestion service interprets it”
+
+4️⃣ TRANSFORMATION_METADATA
+Purpose
+
+Defines how raw data is modified
+
+Key idea
+
+Transformations are:
+
+Ordered
+
+Declarative
+
+Stateless
+
+Example (employee)
+
+Trim name
+
+Cast salary to integer
+
+Rename emp_id → employee_id
+
+Very important rule
+
+Transformation metadata must be generic enough to work for any entity
+
+No entity-specific code allowed.
+
+5️⃣ ENRICHMENT_METADATA
+Purpose
+
+Adds derived or external information
+
+Example
+
+Add load_date = current_date
+
+Add source_system = HRMS
+
+Difference from transformation
+Transformation	Enrichment
+Changes existing fields	Adds new fields
+Deterministic	May depend on context
+Data shaping	Data augmentation
+
+This separation will save you later.
+
+Step 4️⃣: Target Metadata
+6️⃣ SINK_METADATA
+Purpose
+
+Defines where final data lands
+
+Example (employee)
+Sink Type: POSTGRES
+Table: employee_tbl
+Write Mode: UPSERT
+
+Why separate from entity
+
+Tomorrow:
+
+Same entity
+
+Multiple sinks (fan-out)
+
+Different write strategies
+
+You’ll thank yourself later.
+
+Step 5️⃣: Runtime Metadata (OBSERVABILITY CORE)
+
+This metadata is never loaded from YAML.
+
+7️⃣ JOB_EXECUTION
+Purpose
+
+Records what actually happened
+
+One row = one execution of one entity
+Example
+Execution ID: UUID
+Entity: employee
+Status: SUCCESS
+Records: 10,000
+Duration: 12s
+
+Why critical
+
+UI status
+
+Retries
+
+Alerts
+
+Grafana dashboards
+
+Without this, observability collapses.
+
+Step 6️⃣: End-to-End Example (employee)
+
+Let’s connect everything concretely:
+
+Subject Area: workforce
+Entity: employee
+
+Source:
+  FILE → /data/workforce/employee.csv
+
+Transform:
+  TRIM(name)
+  CAST(salary → INT)
+  RENAME(emp_id → employee_id)
+
+Enrich:
+  ADD load_date = now()
+  ADD source_system = HRMS
+
+Sink:
+  POSTGRES → employee_tbl
+
+Runtime:
+  SUCCESS | 10,000 records | 12s
+
+
+Every service reads only what it needs.
+
+Step 7️⃣: What We Do NEXT (Very Important)
+
+Now that meaning is locked, next step is structural locking.
+
+👉 Next step = Flyway V1 metadata schema design
+
+This means:
+
+Table names
+
+Columns
+
+Relationships
+
+Constraints
+
+Just schema.

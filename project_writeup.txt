@@ -1,0 +1,276 @@
+
+📌 Project: Metadata-Driven Ingestion Platform
+🔹 Problem Statement
+
+In large organizations, data ingestion pipelines are often:
+
+tightly coupled to specific datasets
+
+hard-coded for source types (file, DB, API)
+
+difficult to scale and operate
+
+brittle when schemas or load patterns change
+
+The goal of this project was to design and build a metadata-driven, event-orchestrated ingestion platform that can:
+
+onboard new datasets without code changes
+
+support multiple ingestion types (file, DB, API)
+
+scale ingestion and transformation independently
+
+be cloud-ready (EMR / S3) while being testable locally
+
+🔹 High-Level Solution
+
+We built a metadata-driven data platform where:
+
+Spring Boot microservices act as the control plane
+
+Apache Spark acts as the data plane
+
+Kafka is the backbone for event-driven orchestration
+
+S3 is used as the raw data lake (bronze layer initially)
+
+All pipeline behavior is driven by metadata stored in Postgres
+
+The system is fully asynchronous, loosely coupled, and cloud-portable.
+
+🔹 Core Components
+1️⃣ Metadata Service
+
+Stores dataset metadata such as:
+
+source type (FILE / DB / API)
+
+schema
+
+load type (FULL / INCREMENTAL)
+
+file format
+
+target paths
+
+Acts as a single source of truth
+
+Other services consume metadata via REST (read-only)
+
+📌 Key benefit:
+New datasets can be onboarded by inserting metadata—no code change required.
+
+2️⃣ Orchestration Service (Pipeline Brain)
+
+Owns the pipeline lifecycle
+
+Creates and tracks pipeline_run
+
+Listens to pipeline events from Kafka
+
+Decides the next stage to trigger
+
+Publishes intent events like:
+
+INGESTION_REQUESTED
+
+TRANSFORMATION_REQUESTED
+
+📌 Important design choice:
+Orchestration does not execute ingestion or transformation—it only coordinates.
+
+3️⃣ Ingestion Service
+
+Listens to INGESTION_REQUESTED
+
+Reads dataset metadata
+
+Triggers Spark ingestion job using spark-submit
+
+Marks pipeline state as INGESTION_TRIGGERED
+
+Does not process data itself
+
+📌 Key principle:
+Spring Boot services never handle large data—they only trigger compute.
+
+4️⃣ Spark Ingestion Jobs (PySpark)
+
+Fully metadata-driven
+
+Handles:
+
+file ingestion
+
+DB ingestion via JDBC
+
+API ingestion
+
+Writes raw data to S3 (raw / bronze layer)
+
+Publishes INGESTION_JOB_COMPLETED event on Kafka
+
+📌 Spark jobs are external artifacts, not packaged inside services.
+
+5️⃣ Transformation Service (Same Pattern)
+
+Listens to TRANSFORMATION_REQUESTED
+
+Triggers Spark transformation job
+
+Writes transformed data (silver layer)
+
+Publishes TRANSFORMATION_JOB_COMPLETED
+
+The same pattern extends naturally to enrichment and sink stages.
+
+🔹 End-to-End Flow (Interview Friendly)
+
+A pipeline run is initiated via orchestration service.
+Metadata is fetched dynamically.
+Ingestion is triggered via Kafka event.
+Spark processes data and publishes completion events.
+Orchestration reacts to those events and triggers the next stage.
+The entire pipeline progresses through events, not synchronous calls.
+
+⚠️ Key Challenges & How You Solved Them
+1️⃣ Handling Asynchronous Spark Jobs
+
+Challenge:
+Spark jobs are long-running and asynchronous, but pipeline state must be accurate.
+
+Solution:
+
+Never mark a stage as completed on job submission
+
+Update pipeline state only on Spark-emitted completion events
+
+Completion is event-driven, not method-driven
+
+📌 This avoids race conditions and false success states.
+
+2️⃣ Avoiding Tight Coupling Between Services
+
+Challenge:
+Direct REST calls between ingestion and transformation create brittle systems.
+
+Solution:
+
+Used event choreography via Kafka
+
+Same topic, different consumer groups
+
+Each service reacts only to events it owns
+
+📌 This allows independent scaling and deployment.
+
+3️⃣ Supporting Multiple Source Types
+
+Challenge:
+Different ingestion logic for file, DB, API.
+
+Solution:
+
+Spark ingestion job reads source type from metadata
+
+Strategy pattern inside Spark job
+
+No branching logic in Spring Boot
+
+📌 New source types can be added without touching orchestration logic.
+
+4️⃣ Local Development vs Cloud Deployment
+
+Challenge:
+Hard to test EMR-style pipelines locally.
+
+Solution:
+
+Local Spark cluster via Docker
+
+LocalStack for S3
+
+Same spark-submit logic as EMR
+
+Only configuration changes across environments
+
+📌 This gave us environment parity.
+
+5️⃣ Schema Evolution & Large Files
+
+Challenge:
+Large files and evolving schemas.
+
+Solution:
+
+Raw layer stores data as-is
+
+Transformation stage handles schema normalization
+
+Delta Lake planned for bronze/silver for schema evolution and time travel
+
+🧠 Microservice Patterns You Can Highlight
+
+You can confidently mention these in interviews:
+
+✅ Event Choreography (Not Central Orchestration)
+
+No service calls another service directly
+
+Kafka events drive progression
+
+Each service owns its stage
+
+✅ Control Plane vs Data Plane
+
+Spring Boot = orchestration, state, metadata
+
+Spark = heavy data processing
+
+✅ Database per Service
+
+Metadata DB
+
+Pipeline run DB
+
+No shared mutable database
+
+✅ Idempotent Event Handling
+
+PipelineRun state checks before triggering
+
+Safe replays from Kafka
+
+Handles duplicates gracefully
+
+✅ Asynchronous, Non-Blocking Design
+
+No service waits for Spark jobs
+
+Completion is event-driven
+
+High throughput and resilience
+
+✅ Externalized Compute
+
+Spark jobs deployed separately
+
+Services only reference job paths
+
+Enables EMR / Databricks migration
+
+🎯 One-Line Summary (Very Strong)
+
+I designed a metadata-driven, event-orchestrated ingestion platform where Spring Boot microservices manage pipeline state and intent,
+Apache Spark handles scalable data processing, and Kafka enables asynchronous stage coordination.
+The system is cloud-ready, extensible, and supports multiple ingestion types without code changes.
+
+If you want next, I can:
+
+Turn this into a 2-minute spoken script
+
+Create resume bullet points
+
+Prepare follow-up interview questions + answers
+
+Add failure & retry scenarios explanation
