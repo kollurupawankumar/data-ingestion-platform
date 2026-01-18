@@ -21,19 +21,24 @@ public class IngestionEventHandler {
 
     public void handle(IngestionRequestEvent event) {
 
-        // 1. create pipeline run entry
-        pipelineRunService.startRun(event);
+        try {
+            // 1. create pipeline run entry
+            pipelineRunService.startRun(event);
 
-        JobSubmissionRequest req = new JobSubmissionRequest();
-        req.setJobName("spark-job-ingestion");
-        req.setDataset(event.getDataset());
-        req.setSourceType(event.getSourceType());
-        req.setParams(event.getParams());
+            JobSubmissionRequest req = new JobSubmissionRequest();
+            req.setJobName("spark-job-ingestion");
+            req.setDataset(event.getDataset());
+            req.setSourceType(event.getSourceType());
+            req.setParams(event.getParams());
 
-        // 🔥 Fire-and-forget
-        sparkJobRunner.submit(req);
+            // 🔥 Fire-and-forget
+            sparkJobRunner.submit(req);
 
-        // 3. update status
-        pipelineRunService.markIngestedTriggered(event.getPipelineRunId());
+            // 3. update status
+            pipelineRunService.markIngestedTriggered(event.getPipelineRunId());
+        } catch (Exception e) {
+            pipelineRunService.markFailed(event.getPipelineRunId(), e.getClass().getSimpleName(), e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 }

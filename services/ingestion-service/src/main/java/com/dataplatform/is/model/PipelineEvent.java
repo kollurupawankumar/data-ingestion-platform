@@ -1,35 +1,29 @@
 package com.dataplatform.is.model;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 public class PipelineEvent {
 
-    private String eventType;        // INGESTION_JOB_COMPLETED, etc
-    private String pipelineRunId;
+    private String runId;
     private String dataset;
-    private String status;           // SUCCESS / FAILED
-
-    private String dataPath;          // bronzePath / silverPath
+    private String loadType;
+    private String status;
+    private String rawLocation;
+    private String silverLocation;
+    private String goldLocation;
+    private String errorCode;
     private String errorMessage;
+    private LocalDateTime startedAt;
+    private LocalDateTime endedAt;
+    private LocalDateTime lastUpdatedAt;
 
-    private Instant eventTime;
-
-    // getters & setters
-
-    public String getEventType() {
-        return eventType;
+    public String getRunId() {
+        return runId;
     }
 
-    public void setEventType(String eventType) {
-        this.eventType = eventType;
-    }
-
-    public String getPipelineRunId() {
-        return pipelineRunId;
-    }
-
-    public void setPipelineRunId(String pipelineRunId) {
-        this.pipelineRunId = pipelineRunId;
+    public void setRunId(String runId) {
+        this.runId = runId;
     }
 
     public String getDataset() {
@@ -40,6 +34,14 @@ public class PipelineEvent {
         this.dataset = dataset;
     }
 
+    public String getLoadType() {
+        return loadType;
+    }
+
+    public void setLoadType(String loadType) {
+        this.loadType = loadType;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -48,12 +50,36 @@ public class PipelineEvent {
         this.status = status;
     }
 
-    public String getDataPath() {
-        return dataPath;
+    public String getRawLocation() {
+        return rawLocation;
     }
 
-    public void setDataPath(String dataPath) {
-        this.dataPath = dataPath;
+    public void setRawLocation(String rawLocation) {
+        this.rawLocation = rawLocation;
+    }
+
+    public String getSilverLocation() {
+        return silverLocation;
+    }
+
+    public void setSilverLocation(String silverLocation) {
+        this.silverLocation = silverLocation;
+    }
+
+    public String getGoldLocation() {
+        return goldLocation;
+    }
+
+    public void setGoldLocation(String goldLocation) {
+        this.goldLocation = goldLocation;
+    }
+
+    public String getErrorCode() {
+        return errorCode;
+    }
+
+    public void setErrorCode(String errorCode) {
+        this.errorCode = errorCode;
     }
 
     public String getErrorMessage() {
@@ -64,11 +90,45 @@ public class PipelineEvent {
         this.errorMessage = errorMessage;
     }
 
-    public Instant getEventTime() {
-        return eventTime;
+    public LocalDateTime getStartedAt() {
+        return startedAt;
     }
 
-    public void setEventTime(Instant eventTime) {
-        this.eventTime = eventTime;
+    public void setStartedAt(LocalDateTime startedAt) {
+        this.startedAt = startedAt;
+    }
+
+    public LocalDateTime getEndedAt() {
+        return endedAt;
+    }
+
+    public void setEndedAt(LocalDateTime endedAt) {
+        this.endedAt = endedAt;
+    }
+
+    public LocalDateTime getLastUpdatedAt() {
+        return lastUpdatedAt;
+    }
+
+    public void setLastUpdatedAt(LocalDateTime lastUpdatedAt) {
+        this.lastUpdatedAt = lastUpdatedAt;
+    }
+
+    @Override
+    public String toString() {
+        return "PipelineEvent{" +
+                "runId='" + runId + '\'' +
+                ", dataset='" + dataset + '\'' +
+                ", loadType='" + loadType + '\'' +
+                ", status='" + status + '\'' +
+                ", rawLocation='" + rawLocation + '\'' +
+                ", silverLocation='" + silverLocation + '\'' +
+                ", goldLocation='" + goldLocation + '\'' +
+                ", errorCode='" + errorCode + '\'' +
+                ", errorMessage='" + errorMessage + '\'' +
+                ", startedAt=" + startedAt +
+                ", endedAt=" + endedAt +
+                ", lastUpdatedAt=" + lastUpdatedAt +
+                '}';
     }
 }

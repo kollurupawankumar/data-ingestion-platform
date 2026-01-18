@@ -18,4 +18,20 @@ public class IngestionRequestEvent {
     }
 
     public Map<String, String> getParams() { return params; }
+
+    public void setDataset(String dataset) {
+        this.dataset = dataset;
+    }
+
+    public void setSourceType(String sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    public void setPipelineRunId(String pipelineRunId) {
+        this.pipelineRunId = pipelineRunId;
+    }
+
+    public void setParams(Map<String, String> params) {
+        this.params = params;
+    }
 }

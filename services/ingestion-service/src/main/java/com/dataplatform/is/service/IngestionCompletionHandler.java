@@ -16,15 +16,15 @@ public class IngestionCompletionHandler {
 
     public void handle(PipelineEvent event) {
 
-        if (!"INGESTION_JOB_COMPLETED".equals(event.getEventType())) {
+        if (!"INGESTION_JOB_COMPLETED".equals(event.getStatus())) {
             return; // ignore others
         }
 
         if ("SUCCESS".equals(event.getStatus())) {
             // 1. Mark INGESTED
-            pipelineRunService.markIngested(event.getPipelineRunId());
+            pipelineRunService.markIngested(event.getRunId());
         } else {
-            pipelineRunService.markFailed(event.getPipelineRunId());
+            pipelineRunService.markFailed(event.getRunId(), event.getErrorCode(), event.getErrorMessage());
         }
     }
 }

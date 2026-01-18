@@ -14,7 +14,8 @@ public class IngestionKafkaListener {
         this.sparkJobRunner = sparkJobRunner;
     }
 
-    @KafkaListener(topics = "ingestion-requests")
+    @KafkaListener(topics = "ingestion-requests" ,
+                   groupId = "ingestion-service")
     public void listen(IngestionRequestEvent event) {
         sparkJobRunner.handle(event);
     }
