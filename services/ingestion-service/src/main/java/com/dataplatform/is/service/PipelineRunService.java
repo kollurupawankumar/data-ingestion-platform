@@ -37,7 +37,7 @@ public class PipelineRunService {
                 sql,
                 event.getPipelineRunId(),
                 event.getDataset(),
-                event.getParams().get("LoadType")
+                event.getSourceConfig().get("LoadType")
         );
     }
 

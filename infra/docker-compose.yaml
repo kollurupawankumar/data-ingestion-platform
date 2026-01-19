@@ -54,6 +54,7 @@ services:
   # -----------------------
   # Spark Master
   # -----------------------
+  # -----------------------
   spark-master:
     build: ./spark
     container_name: spark-master
@@ -111,8 +112,9 @@ services:
     environment:
       - SERVICES=s3
       - DEBUG=1
+      - LOCALSTACK_UI=1
     volumes:
-      - ./localstack-data:/var/lib/localstack
+      - /Users/pawan/developer/data-ingestion-platform/data:/data
 
 
   postgres:

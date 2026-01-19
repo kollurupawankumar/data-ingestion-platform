@@ -2,7 +2,9 @@ package com.dataplatform.is.service;
 
 import com.dataplatform.is.model.IngestionRequestEvent;
 import com.dataplatform.is.model.JobSubmissionRequest;
+import com.dataplatform.is.model.SourceType;
 import com.dataplatform.is.spark.SparkJobRunner;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,9 +29,10 @@ public class IngestionEventHandler {
 
             JobSubmissionRequest req = new JobSubmissionRequest();
             req.setJobName("spark-job-ingestion");
+            req.setPipelineRunId(event.getPipelineRunId());
             req.setDataset(event.getDataset());
             req.setSourceType(event.getSourceType());
-            req.setParams(event.getParams());
+            req.setSourceConfig(event.getSourceConfig());
 
             // 🔥 Fire-and-forget
             sparkJobRunner.submit(req);

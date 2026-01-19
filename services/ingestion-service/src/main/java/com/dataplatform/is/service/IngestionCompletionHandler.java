@@ -16,7 +16,7 @@ public class IngestionCompletionHandler {
 
     public void handle(PipelineEvent event) {
 
-        if (!"INGESTION_JOB_COMPLETED".equals(event.getStatus())) {
+        if (!"INGESTION_JOB_COMPLETED".equals(event.getStatus()) || !"INGESTION_JOB_FAILED".equals(event.getStatus())) {
             return; // ignore others
         }
 
