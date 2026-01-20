@@ -1,0 +1,15 @@
+package com.dataplatform.is.model;
+
+public enum PipelineState {
+
+    INGESTION_STARTED,
+    INGESTION_TRIGGERED,
+    INGESTION_RUNNING,
+
+    SILVER_PROCESSING_TRANSFORMATION,
+    GOLD_PROCESSING_ENRICHMENT,
+
+    COMPLETED,
+    FAILED
+}
+

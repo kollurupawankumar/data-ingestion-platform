@@ -46,7 +46,7 @@ public class Main {
         // CONFIG
         // -----------------------------
         String localFilePath = "/Users/pawan/developer/data-ingestion-platform/data/users.csv";
-        String bucket = "raw-bucket";
+        String bucket = "bronze-bucket";
         String s3Key = "workforce/users.csv";
 
         String kafkaBootstrap = "localhost:9092";
@@ -70,7 +70,7 @@ public class Main {
                 )
                 .build();
         createBucketIfNotExists(s3Client, "raw-bucket");
-        PutObjectRequest putReq = PutObjectRequest.builder()
+        /*PutObjectRequest putReq = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(s3Key)
                 .build();
@@ -99,6 +99,9 @@ public class Main {
         event.put("pipelineRunId", pipelineRunId);
         event.put("dataset", "users");
         event.put("sourceType", "FILE");
+        event.put("jobName", "Main-file-trigger-job");
+        event.put("jobPath","/jobs/ingestion/spark-job-ingestion.py");
+
 
         Map<String, String> sourceConfig = new HashMap<>();
         sourceConfig.put("inputPath", s3Path);
@@ -106,7 +109,7 @@ public class Main {
         sourceConfig.put("header", "true");
         sourceConfig.put("targetDatabase", "bronze");
         sourceConfig.put("targetTable", "workforce_users");
-        sourceConfig.put("LoadType", "workforce_users");
+        sourceConfig.put("loadType", "workforce_users");
 
 
 

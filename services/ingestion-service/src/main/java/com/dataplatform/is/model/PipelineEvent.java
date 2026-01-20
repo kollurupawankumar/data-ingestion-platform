@@ -5,7 +5,8 @@ import java.time.LocalDateTime;
 
 public class PipelineEvent {
 
-    private String runId;
+    private String pipelineRunId;
+    private String eventType;
     private String dataset;
     private String loadType;
     private String status;
@@ -18,12 +19,12 @@ public class PipelineEvent {
     private LocalDateTime endedAt;
     private LocalDateTime lastUpdatedAt;
 
-    public String getRunId() {
-        return runId;
+    public String getPipelineRunId() {
+        return pipelineRunId;
     }
 
-    public void setRunId(String runId) {
-        this.runId = runId;
+    public void setPipelineRunId(String pipelineRunId) {
+        this.pipelineRunId = pipelineRunId;
     }
 
     public String getDataset() {
@@ -114,10 +115,18 @@ public class PipelineEvent {
         this.lastUpdatedAt = lastUpdatedAt;
     }
 
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
+
     @Override
     public String toString() {
         return "PipelineEvent{" +
-                "runId='" + runId + '\'' +
+                "pipelineRunId='" + pipelineRunId + '\'' +
                 ", dataset='" + dataset + '\'' +
                 ", loadType='" + loadType + '\'' +
                 ", status='" + status + '\'' +

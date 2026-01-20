@@ -34,6 +34,9 @@ public class IngestionEventHandler {
             req.setSourceType(event.getSourceType());
             req.setSourceConfig(event.getSourceConfig());
 
+            req.setJobName(event.getJobName());
+            req.setJobPath(event.getJobPath());
+
             // 🔥 Fire-and-forget
             sparkJobRunner.submit(req);
 

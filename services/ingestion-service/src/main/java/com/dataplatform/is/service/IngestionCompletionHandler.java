@@ -15,16 +15,16 @@ public class IngestionCompletionHandler {
     }
 
     public void handle(PipelineEvent event) {
-
-        if (!"INGESTION_JOB_COMPLETED".equals(event.getStatus()) || !"INGESTION_JOB_FAILED".equals(event.getStatus())) {
+        System.out.println("The pipeline event - "+event.toString());
+        if (!"INGESTION_JOB_COMPLETED".equals(event.getEventType()) && !"INGESTION_JOB_FAILED".equals(event.getEventType())) {
             return; // ignore others
         }
 
-        if ("SUCCESS".equals(event.getStatus())) {
+        if ("COMPLETED".equals(event.getStatus())) {
             // 1. Mark INGESTED
-            pipelineRunService.markIngested(event.getRunId());
+            pipelineRunService.markIngested(event.getPipelineRunId());
         } else {
-            pipelineRunService.markFailed(event.getRunId(), event.getErrorCode(), event.getErrorMessage());
+            pipelineRunService.markFailed(event.getPipelineRunId(), event.getErrorCode(), event.getErrorMessage());
         }
     }
 }
