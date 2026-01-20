@@ -2,6 +2,7 @@ package com.dataplatform.is.service;
 
 import com.dataplatform.is.model.IngestionRequestEvent;
 import com.dataplatform.is.model.JobSubmissionRequest;
+import com.dataplatform.is.model.PipelineState;
 import com.dataplatform.is.model.SourceType;
 import com.dataplatform.is.spark.SparkJobRunner;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,13 +12,13 @@ import org.springframework.stereotype.Service;
 public class IngestionEventHandler {
 
 
-    private final PipelineRunService pipelineRunService;
+    private final PipelineRunTrackingService pipelineRunTrackingService;
     private final SparkJobRunner sparkJobRunner;
 
-    public IngestionEventHandler(PipelineRunService pipelineRunService,
+    public IngestionEventHandler(PipelineRunTrackingService pipelineRunTrackingService,
                                  SparkJobRunner sparkJobRunner) {
 
-        this.pipelineRunService = pipelineRunService;
+        this.pipelineRunTrackingService = pipelineRunTrackingService;
         this.sparkJobRunner = sparkJobRunner;
     }
 
@@ -25,7 +26,7 @@ public class IngestionEventHandler {
 
         try {
             // 1. create pipeline run entry
-            pipelineRunService.startRun(event);
+            pipelineRunTrackingService.startRun(event);
 
             JobSubmissionRequest req = new JobSubmissionRequest();
             req.setJobName("spark-job-ingestion");
@@ -41,9 +42,9 @@ public class IngestionEventHandler {
             sparkJobRunner.submit(req);
 
             // 3. update status
-            pipelineRunService.markIngestedTriggered(event.getPipelineRunId());
+            pipelineRunTrackingService.transitionState(event.getPipelineRunId(), PipelineState.INGESTION_TRIGGERED);
         } catch (Exception e) {
-            pipelineRunService.markFailed(event.getPipelineRunId(), e.getClass().getSimpleName(), e.getMessage());
+            pipelineRunTrackingService.failRun(event.getPipelineRunId(), e.getClass().getSimpleName(), e.getMessage());
             throw new RuntimeException(e);
         }
     }

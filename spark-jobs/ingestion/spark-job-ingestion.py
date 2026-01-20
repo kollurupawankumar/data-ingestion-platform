@@ -265,19 +265,32 @@ def write_bronze_table(df, database, table):
 
 def main():
     args = parse_args()
-
     spark = create_spark_session(args.pipelineRunId)
     producer = create_kafka_producer()
 
     started_at = now_utc()
     raw_location = args.inputPath
-
     schema = build_schema(args.schema)
 
     try:
         # -------------------------
         # READ
         # -------------------------
+
+        running_event = build_pipeline_event(
+                                run_id=args.pipelineRunId,
+                                event_type="INGESTION_JOB_RUNNING",
+                                dataset=args.dataset,
+                                load_type=args.loadType,
+                                status="RUNNING",
+                                raw_location=raw_location,
+                                silver_location=None,
+                                gold_location=None,
+                                started_at=started_at,
+                                ended_at=now_utc()
+                            )
+        publish_pipeline_event(producer, running_event)
+
         if args.sourceType == "FILE":
             df = read_file(spark, args, schema)
         elif args.sourceType == "DB":

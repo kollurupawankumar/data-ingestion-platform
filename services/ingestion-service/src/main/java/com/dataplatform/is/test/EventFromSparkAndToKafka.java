@@ -182,6 +182,8 @@ public class EventFromSparkAndToKafka {
         //mockPublishEventFromSparkJob(runId);
         mockPublishEvenToIngestion();
         //placeAnObjectToS3(localFilePath, bucket, s3Key);
+        //S3Client s3Client = createS3Client();
+        //createBucketIfNotExists(s3Client, "bronze-bucket");
 
 
     }
